@@ -1,0 +1,114 @@
+version: "3.8"
+
+services:
+  # mysql:
+  #   build:
+  #     context: ./mysql
+  #   restart: always
+  #   environment:
+  #     - MYSQL_DATABASE=${MY_DB_NAME}
+  #     - MYSQL_USER=${MY_DB_USER}
+  #     - MYSQL_PASSWORD=${MY_DB_PASSWORD}
+  #     - MYSQL_ROOT_PASSWORD=${MY_DB_ROOT_PASSWORD}
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #     - ./mysql/data:/var/lib/mysql
+
+  postgres:
+    build:
+      context: ./postgres
+    restart: always
+    container_name: ${PROJECT_NAME}-postgres
+    environment:
+      - POSTGRES_DB=${PG_DB_NAME}
+      - POSTGRES_USER=${PG_DB_USER}
+      - POSTGRES_PASSWORD=${PG_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/data/:/var/lib/postgresql/data/
+
+  php-fpm:
+    build:
+      context: ./php-fpm
+    restart: always
+    container_name: ${PROJECT_NAME}-php-fpm
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=postgresql://${PG_DB_USER}:${PG_DB_PASSWORD}@postgres:5432/${PG_DB_NAME}
+      - XDEBUG_REMOTE_HOST=${XDEBUG_REMOTE_HOST}
+    volumes:
+      - ./src/:/var/www/
+      - ./php-fpm/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./php-fpm/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+  composer:
+    image: composer
+    volumes:
+      - ./src/:/app/
+    command: install
+
+  nginx:
+    build:
+      context: ./nginx
+    restart: always
+    volumes:
+      - ./src/:/var/www/
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php-fpm
+      - postgres
+    ports:
+      - "8000:80"
+
+  node:
+    image: node:latest
+    volumes:
+      - ./src:/app
+    working_dir: /app
+    command: ["npm", "install"]
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+
+
+    # -d для detach терминала
+    # docker-compose up -d
+    # docker-compose down -v
+    # docker-compose run composer
+    # docker-compose run composer create
+    # docker-compose run composer create laravel/laravel .
+
+    # docker-compose build
+
+    # docker ps   -посмотреть рабочие контейнеры
+    # docker exec -it <CONTAINER_ID> /bin/sh перейти в командную строку контейнера
+    # docker exec -it f1313d0a4c38 chmod -R 777 /var/www/laravel/storage
+    # docker exec -it f1313d0a4c38 /bin/sh
+    # docker exec -it --user=root <CONTAINER_ID> chmod -R 777 /var/www/laravel/storage   --ругался на права для папки
+    # docker exec php artisan make:migration create_flights_table
+
+
+
+    # docker exec -it f86e2038d844 php --ini
+    # docker exec -it f86e2038d844 chmod -R 777 /var/www/laravel_activity/storage
+
+#помощь
+#   docker exec -it <CONTAINER_ID> /bin/sh перейти в командную строку контейнера
+#   docker exec -it <CONTAINER_ID> chmod -R 777 /var/www/laravel/storage
+
+#   docker-compose exec php-fpm php /var/www/laravel_activity/artisan
+
+
+
+

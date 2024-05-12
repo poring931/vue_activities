@@ -1,0 +1,45 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc --noEmit && vite build",
+        "ts-check": "vue-tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/node": "^20.12.7",
+        "@typescript-eslint/eslint-plugin": "^7.6.0",
+        "@typescript-eslint/parser": "^7.6.0",
+        "@typescript-eslint/scope-manager": "^7.6.0",
+        "@typescript-eslint/type-utils": "^7.6.0",
+        "@typescript-eslint/types": "^7.6.0",
+        "@typescript-eslint/typescript-estree": "^7.6.0",
+        "@typescript-eslint/utils": "^7.6.0",
+        "@typescript-eslint/visitor-keys": "^7.6.0",
+        "@vitejs/plugin-vue": "^5.0.4",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-import": "^2.29.1",
+        "laravel-vite-plugin": "^1.0",
+        "prettier": "^3.2.5",
+        "typescript": "^5.4.3",
+        "unplugin-auto-import": "^0.17.5",
+        "vite": "^5.0",
+        "vite-plugin-stylelint": "^5.3.1",
+        "vite-plugin-vuetify": "^2.0.3",
+        "vue-tsc": "^2.0.7",
+        "vuetify": "^3.5.14"
+    },
+    "dependencies": {
+        "@mdi/font": "^7.4.47",
+        "axios": "^1.6.8",
+        "chart.js": "^4.4.2",
+        "normalize-scss": "^8.0.0",
+        "pinia": "^2.1.7",
+        "sass": "^1.72.0",
+        "vue": "^3.4.21",
+        "vue-chart-3": "^3.1.8",
+        "vue-chartjs": "^5.3.1",
+        "vue-router": "^4.3.0"
+    }
+}

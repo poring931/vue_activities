@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/laravel_activity" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/base" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/global" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_commit_ts" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_dynshmem" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_logical" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_multixact" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_notify" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_replslot" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_serial" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_snapshots" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_stat" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_stat_tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_subtrans" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_tblspc" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_twophase" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_wal" />
+      <excludeFolder url="file://$MODULE_DIR$/postgres/data/pg_xact" />
+      <excludeFolder url="file://$MODULE_DIR$/src/laravel_activity/public/build" />
+      <excludeFolder url="file://$MODULE_DIR$/src/laravel_activity/vendor" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
