@@ -1,34 +1,44 @@
 <template>
-
-  <v-table>
-    <thead>
-    <tr>
-      <th class="text-left">
-        Name
-      </th>
-      <th class="text-left">
-        Calories
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr
-        v-for="item in desserts"
-        :key="item.name"
-    >
-      <td>{{ item.name }}</td>
-      <td>{{ item.calories }}</td>
-    </tr>
-    </tbody>
-  </v-table>
+  <div>
+    <v-table>
+      <thead>
+      <tr>
+        <th class="text-left">Duration</th>
+        <th class="text-left">Starts At</th>
+        <th class="text-left">End At</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="activity in data" :key="activity.id">
+        <td>{{ activity.duration }}</td>
+        <td>{{ activity.start_date }}</td>
+        <td>{{ activity.end_date }}</td>
+      </tr>
+      </tbody>
+    </v-table>
+    <button @click="loadMore" v-if="store.hasMore[sectionId]">Load More</button>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {VTable} from 'vuetify/components'
+import { VTable } from 'vuetify/components';
+import { useActivitiesStore } from '@/entities/Activity';
+import { PropType } from 'vue';
 
-const desserts = [
-  {name: 'Cake', calories: 300},
-  {name: 'Ice Cream', calories: 200},
-  {name: 'Pie', calories: 400},
-];
+const props = defineProps({
+  data: {
+    type: Array as PropType<Array<{ id: string, duration: string, start_date: string, end_date: string }>>,
+    required: true,
+  },
+  sectionId: {
+    type: Number,
+    required: true,
+  }
+});
+
+const store = useActivitiesStore();
+
+const loadMore = async () => {
+  await store.loadMore(props.sectionId);
+};
 </script>

@@ -4,23 +4,11 @@
     <Loader v-if="isLoading"/>
     <div v-else>
       <div v-for="item in data" :key="item.section.id">
-        <h2>{{ item.section.name }}</h2>
-        <ul>
-          <li v-for="activity in item.activities.data" :key="activity.id">
-            {{ activity.duration }} : {{ activity.start_date }}
-          </li>
-        </ul>
+        <h2  class="text-center">{{ item.section.name }}</h2>
+        <Table :data="item.activities.data" :sectionId="item.section.id"/>
       </div>
-
     </div>
   </div>
-  <hr>
-
-  <hr>
-  <Table
-      v-if="!isLoading"
-      :data="data"
-  />
   <hr>
 </template>
 
@@ -34,12 +22,10 @@ const store = useActivitiesStore();
 const isLoading = ref(false);
 const data = ref([]);
 
-onMounted(() => {
+onMounted(async () => {
   isLoading.value = true;
-  store.fetchActivities().then(() => {
-    isLoading.value = false;
-    data.value = store.data;
-  });
-  console.log(data.section)
+  await store.fetchActivities();
+  isLoading.value = false;
+  data.value = store.data;
 });
 </script>

@@ -1,6 +1,5 @@
 <template>
 
-  <h1>Главная</h1>
   <Activity/>
 
   <DoughnutChart :chartData="testData"/>

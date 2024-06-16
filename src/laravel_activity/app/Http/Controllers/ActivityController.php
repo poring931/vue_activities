@@ -13,46 +13,55 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): array
+    public function index(Request $request): array
     {
-        $activitySections = ActivitySection::with('activities')
-            ->whereNull('activity_section_id')
-            ->whereHas(
-                'activities'
-            )->get();
+	    $sectionId = $request->input('section_id');
+	    $pageNum = $request->input('page', 1); // Если параметр pageNum не передан, используем значение 1 по умолчанию
 
-        return $this->getSectionsWithActivities($activitySections);
+	    // Используем условия для фильтрации данных
+	    $query = ActivitySection::query()->whereHas(
+		    'activities'
+	    )
+		    ->whereNull('activity_section_id');
+
+	    if ($sectionId) {
+		    $query->where('id', $sectionId);
+	    }
+
+	    $activitySections = $query->get();
+
+	    return $this->getSectionsWithActivities($activitySections, $pageNum);
     }
 
-    private function getSectionsWithActivities($sections, $parentSection = null): array
-    {
-        $data = [];
+	private function getSectionsWithActivities($sections, $pageNum = 1, $parentSection = null): array
+	{
+		$data = [];
 
-        foreach ($sections as $section) {
-            $sectionActivities = $this->paginate($section->activities, 10, 1, [])
-                ->appends(
-                    ['section_id' => $section->id]
-                );
-            $sectionData = [
-                'section' => [
-                    'id' => $section->id,
-                    'name' => $section->name,
-                    'description' => $section->description,
-                    'depth' => $section->depth,
-                    'parent_section_id' => $parentSection ? $parentSection->id : null,
-                ],
-                'activities' => $sectionActivities,
-            ];
+		foreach ($sections as $section) {
+			$sectionActivities = $this->paginate($section->activities, 10, $pageNum, [])
+				->appends(['section_id' => $section->id]);
 
-            if ($section->children) {
-                $sectionData['children'] = $this->getSectionsWithActivities($section->children, $section);
-            }
+			$sectionData = [
+				'section' => [
+					'id' => $section->id,
+					'name' => $section->name,
+					'description' => $section->description,
+					'depth' => $section->depth,
+					'parent_section_id' => $parentSection ? $parentSection->id : null,
+				],
+				'activities' => $sectionActivities,
+			];
 
-            $data[] = $sectionData;
-        }
+			if ($section->children) {
+				$sectionData['children'] = $this->getSectionsWithActivities($section->children, $pageNum, $section);
+			}
 
-        return $data;
-    }
+			$data[$section->id] = $sectionData;
+		}
+
+		return $data;
+	}
+
 
     private function paginate($items, $perPage, $page = null, $options = []): LengthAwarePaginator
     {
