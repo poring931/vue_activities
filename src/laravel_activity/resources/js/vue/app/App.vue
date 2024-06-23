@@ -1,11 +1,12 @@
 <template>
-  <v-app>
+  <v-app theme="light">
 
 
     <Header/>
 
 
     <main>
+<!--      https://learnvue.co/articles/vue-router-transitions  что-то подобное потом прикрутить-->
       <router-view></router-view>
     </main>
 

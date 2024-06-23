@@ -10,9 +10,7 @@ use Illuminate\Support\Collection;
 
 class ActivityController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   private const CACHE_TIME = 600;
     public function index(Request $request): array
     {
 	    $sectionId = $request->input('section_id');
@@ -28,7 +26,14 @@ class ActivityController extends Controller
 		    $query->where('id', $sectionId);
 	    }
 
-	    $activitySections = $query->get();
+
+	    $cacheKey = 'activity_sections_' . $sectionId . '_page_' . $pageNum;
+
+		return cache()->remember($cacheKey, self::CACHE_TIME, function () use ($query, $pageNum) {
+			$activitySections = $query->get();
+
+			return $this->getSectionsWithActivities($activitySections, $pageNum);
+		});
 
 	    return $this->getSectionsWithActivities($activitySections, $pageNum);
     }

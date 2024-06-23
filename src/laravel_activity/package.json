@@ -32,6 +32,7 @@
     },
     "dependencies": {
         "@mdi/font": "^7.4.47",
+        "@mdi/js": "^7.4.47",
         "axios": "^1.6.8",
         "chart.js": "^4.4.2",
         "normalize-scss": "^8.0.0",
