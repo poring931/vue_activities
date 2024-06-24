@@ -1,26 +1,74 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
+import axios from 'axios';
+import {TimerState} from "@/entities/Activity/model/types/timer";
 
-export const useTimerStore = defineStore('timer', {
-    state: () => ({
-        isActive: false,
-        startTime: 0,
-        elapsedTime: 0,
-        intervalId: null, // Добавляем поле для хранения идентификатора интервала
+export const useTimerStore = defineStore('timers', {
+    state: (): TimerState => ({
+        data: {}
     }),
     actions: {
-        start() {
-            if (!this.isActive) {
-                this.isActive = true;
-                this.startTime = Date.now();
-                this.intervalId = setInterval(() => {
-                    this.elapsedTime = Date.now() - this.startTime;
+        async start(sectionId: number, activityId: number | null) {
+            const timerId = activityId || sectionId;
+            if (!this.data[timerId]) {
+                this.data[timerId] = {
+                    isActive: false,
+                    startTime: 0,
+                    elapsedTime: 0,
+                    intervalId: null,
+                    updateIntervalId: null,
+                    activityId,
+                    sectionId,
+                };
+            }
+
+            const timer = this.data[timerId];
+            if (!timer.isActive) {
+                timer.isActive = true;
+                timer.startTime = Date.now();
+
+                if (!timer.activityId) {
+                    try {
+                        const response = await axios.post('/api/activities', {sectionId});
+                        timer.activityId = response.data.id;
+                    } catch (error) {
+                        console.error('Failed to create activity:', error);
+                    }
+                }
+
+                timer.intervalId = setInterval(() => {
+                    timer.elapsedTime = Date.now() - timer.startTime;
                 }, 1000);
+
+                timer.updateIntervalId = setInterval(async () => {
+                    if (timer.activityId) {
+                        try {
+                            await axios.put(`/api/activities/${timer.activityId}`, {duration: timer.elapsedTime});
+                        } catch (error) {
+                            console.error('Failed to update activity periodically:', error);
+                        }
+                    }
+                }, 60000); // Update every 60 seconds
             }
         },
-        stop() {
-            this.isActive = false;
-            clearInterval(this.intervalId); // Очищаем конкретный интервал по его идентификатору
-            this.elapsedTime = 0; // Сбрасываем время после остановки
-        },
+        async stop(sectionId: number, activityId: number | null) {
+            const timerId = activityId || sectionId;
+            const timer = this.data[timerId];
+            if (timer && timer.isActive) {
+                timer.isActive = false;
+                clearInterval(timer.intervalId);
+                clearInterval(timer.updateIntervalId);
+
+                try {
+                    if (timer.activityId) {
+                        await axios.put(`/api/activities/${timer.activityId}`, {duration: timer.elapsedTime});
+                    }
+                } catch (error) {
+                    console.error('Failed to update activity:', error);
+                }
+
+                timer.elapsedTime = 0;
+                timer.activityId = null;
+            }
+        }
     },
 });

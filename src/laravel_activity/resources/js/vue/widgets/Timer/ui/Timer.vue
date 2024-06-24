@@ -1,11 +1,10 @@
 <template>
   <div class="timer d-flex justify-center ga-4 align-center pa-2 border-lg"
        :class="{
-    'border-warning': isActive,
-    'border-info': !isActive
-  }"
+         'border-warning': isActive,
+         'border-info': !isActive
+       }"
   >
-
     <div class="text-h5">{{ formattedTime }}</div>
     <transition-group name="fade">
       <v-icon
@@ -32,26 +31,41 @@
 </template>
 
 <script setup lang="ts">
-import {VIcon} from 'vuetify/components';
-import {useTimerStore} from '@/entities/Activity/model/store/useTimerStore';
-import {TransitionGroup} from 'vue';
-
+import { VIcon } from 'vuetify/components';
+import { useTimerStore } from '@/entities/Activity/model/store/useTimerStore';
+import { computed } from 'vue';
+const props = defineProps({
+  sectionId: {
+    type: Number,
+    required: true,
+  },
+  activityId: {
+    type: Number,
+    required: false,
+  }
+});
 const store = useTimerStore();
 
-const isActive = computed(() => store.isActive);
+const isActive = computed(() => {
+  const timer = store.data[props.activityId || props.sectionId];
+  return timer ? timer.isActive : false;
+});
 
 const startTimer = () => {
-  store.start();
+  store.start(props.sectionId, props.activityId);
 };
 
 const stopTimer = () => {
-  store.stop();
+  store.stop(props.sectionId, props.activityId);
 };
 
 const formattedTime = computed(() => {
-  const hours = Math.floor(store.elapsedTime / (1000 * 60 * 60));
-  const minutes = Math.floor((store.elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((store.elapsedTime % (1000 * 60)) / 1000);
+  const timer = store.data[props.activityId || props.sectionId];
+  if (!timer) return '00:00:00';
+
+  const hours = Math.floor(timer.elapsedTime / (1000 * 60 * 60));
+  const minutes = Math.floor((timer.elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timer.elapsedTime % (1000 * 60)) / 1000);
 
   return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
 });
@@ -79,7 +93,6 @@ const padZero = (num: number) => {
   opacity: 0;
   transform: scaleY(0.01) translate(30px, 0);
 }
-
 
 .fade-leave-active {
   position: absolute;

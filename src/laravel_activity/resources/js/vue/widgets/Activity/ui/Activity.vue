@@ -6,7 +6,7 @@
       <div v-for="item in data" :key="item.section.id" class="mt-16">
         <div class="d-flex justify-center ga-4 align-center">
           <h2 class="text-center">{{ item.section.name }}</h2>
-          <Timer/>
+          <Timer :sectionId="item.section.id"/>
 
         </div>
         <Table :data="item.activities.data" :sectionId="item.section.id"/>

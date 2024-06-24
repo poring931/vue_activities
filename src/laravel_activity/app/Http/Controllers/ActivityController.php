@@ -10,24 +10,25 @@ use Illuminate\Support\Collection;
 
 class ActivityController extends Controller
 {
-   private const CACHE_TIME = 600;
-    public function index(Request $request): array
-    {
-	    $sectionId = $request->input('section_id');
-	    $pageNum = $request->input('page', 1); // Если параметр pageNum не передан, используем значение 1 по умолчанию
+	private const CACHE_TIME = 600;
 
-	    // Используем условия для фильтрации данных
-	    $query = ActivitySection::query()->whereHas(
-		    'activities'
-	    )
-		    ->whereNull('activity_section_id');
+	public function index(Request $request): array
+	{
+		$sectionId = $request->input('section_id');
+		$pageNum = $request->input('page', 1); // Если параметр pageNum не передан, используем значение 1 по умолчанию
 
-	    if ($sectionId) {
-		    $query->where('id', $sectionId);
-	    }
+		// Используем условия для фильтрации данных
+		$query = ActivitySection::query()->whereHas(
+			'activities'
+		)
+			->whereNull('activity_section_id');
+
+		if ($sectionId) {
+			$query->where('id', $sectionId);
+		}
 
 
-	    $cacheKey = 'activity_sections_' . $sectionId . '_page_' . $pageNum;
+		$cacheKey = 'activity_sections_' . $sectionId . '_page_' . $pageNum;
 
 		return cache()->remember($cacheKey, self::CACHE_TIME, function () use ($query, $pageNum) {
 			$activitySections = $query->get();
@@ -35,8 +36,8 @@ class ActivityController extends Controller
 			return $this->getSectionsWithActivities($activitySections, $pageNum);
 		});
 
-	    return $this->getSectionsWithActivities($activitySections, $pageNum);
-    }
+		return $this->getSectionsWithActivities($activitySections, $pageNum);
+	}
 
 	private function getSectionsWithActivities($sections, $pageNum = 1, $parentSection = null): array
 	{
@@ -68,65 +69,65 @@ class ActivityController extends Controller
 	}
 
 
-    private function paginate($items, $perPage, $page = null, $options = []): LengthAwarePaginator
-    {
-        $page = $page ?? LengthAwarePaginator::resolveCurrentPage() ?? 1;
-        $items = $items instanceof Collection ? $items : Collection::make($items);
+	private function paginate($items, $perPage, $page = null, $options = []): LengthAwarePaginator
+	{
+		$page = $page ?? LengthAwarePaginator::resolveCurrentPage() ?? 1;
+		$items = $items instanceof Collection ? $items : Collection::make($items);
 
-        return new LengthAwarePaginator(
-            $items->forPage($page, $perPage),
-            $items->count(),
-            $perPage,
-            $page,
-            $options
-        );
-    }
+		return new LengthAwarePaginator(
+			$items->forPage($page, $perPage),
+			$items->count(),
+			$perPage,
+			$page,
+			$options
+		);
+	}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+	/**
+	 * Show the form for creating a new resource.
+	 */
+	public function create()
+	{
+		//
+	}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store(Request $request)
+	{
+		$activity = new Activity();
+		$activity->start_date = now();
+		$activity->activity_section_id = $request->sectionId;
+		$activity->save();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Activity $activity)
-    {
-        //
-    }
+		return response()->json($activity, 201);
+	}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Activity $activity)
-    {
-        //
-    }
+	public function update(Request $request, $id)
+	{
+		$activity = Activity::findOrFail($id);
+		$activity->duration = gmdate('H:i:s', $request->duration / 1000);
+		$activity->end_date = now();
+		$activity->save();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Activity $activity)
-    {
-        //
-    }
+		return response()->json($activity);
+	}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Activity $activity)
-    {
-        //
-    }
+	/**
+	 * Show the form for editing the specified resource.
+	 */
+	public function edit(Activity $activity)
+	{
+		//
+	}
+
+
+	/**
+	 * Remove the specified resource from storage.
+	 */
+	public function destroy(Activity $activity)
+	{
+		//
+	}
 }

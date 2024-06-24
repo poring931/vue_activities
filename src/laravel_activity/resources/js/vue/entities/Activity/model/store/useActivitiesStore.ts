@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 import axios from 'axios';
 
 export const useActivitiesStore = defineStore('activities', {
@@ -70,7 +70,7 @@ export const useActivitiesStore = defineStore('activities', {
                 }
             } catch (error) {
                 console.error('Error loading more activities:', error);
-            }  finally {
+            } finally {
                 this.sectionLoading[sectionId] = false;
             }
         }
