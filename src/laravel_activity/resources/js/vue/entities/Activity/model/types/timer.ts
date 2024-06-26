@@ -9,5 +9,5 @@ export interface Timer {
 }
 
 export interface TimerState {
-    timers: { [key: string]: Timer };
+    data: { [key: string]: Timer };
 }

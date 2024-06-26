@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia';
 import axios from 'axios';
-import {TimerState} from "@/entities/Activity/model/types/timer";
+import {Timer, TimerState} from "@/entities/Activity/model/types/timer";
+import {useActivitiesStore} from "@/entities/Activity";
 
 export const useTimerStore = defineStore('timers', {
     state: (): TimerState => ({
@@ -18,36 +19,41 @@ export const useTimerStore = defineStore('timers', {
                     updateIntervalId: null,
                     activityId,
                     sectionId,
+                    createTimeoutId: null,
                 };
             }
 
-            const timer = this.data[timerId];
+            const timer: Timer | undefined = this.data[timerId];
             if (!timer.isActive) {
                 timer.isActive = true;
                 timer.startTime = Date.now();
-
-                if (!timer.activityId) {
-                    try {
-                        const response = await axios.post('/api/activities', {sectionId});
-                        timer.activityId = response.data.id;
-                    } catch (error) {
-                        console.error('Failed to create activity:', error);
-                    }
-                }
 
                 timer.intervalId = setInterval(() => {
                     timer.elapsedTime = Date.now() - timer.startTime;
                 }, 1000);
 
-                timer.updateIntervalId = setInterval(async () => {
-                    if (timer.activityId) {
+                // Delay creation of the activity for 60 seconds
+                timer.createTimeoutId = setTimeout(async () => {
+                    if (!timer.activityId) {
                         try {
-                            await axios.put(`/api/activities/${timer.activityId}`, {duration: timer.elapsedTime});
+                            const response = await axios.post('/api/activities', { sectionId });
+                            timer.activityId = response.data.id;
+
+                            // Start the periodic update only after the activity is created
+                            timer.updateIntervalId = setInterval(async () => {
+                                if (timer.activityId) {
+                                    try {
+                                        await axios.put(`/api/activities/${timer.activityId}`, { duration: timer.elapsedTime });
+                                    } catch (error) {
+                                        console.error('Failed to update activity periodically:', error);
+                                    }
+                                }
+                            }, 60000); // Update every 60 seconds
                         } catch (error) {
-                            console.error('Failed to update activity periodically:', error);
+                            console.error('Failed to create activity:', error);
                         }
                     }
-                }, 60000); // Update every 60 seconds
+                }, 30000); // Delay by 60 seconds
             }
         },
         async stop(sectionId: number, activityId: number | null) {
@@ -60,7 +66,10 @@ export const useTimerStore = defineStore('timers', {
 
                 try {
                     if (timer.activityId) {
-                        await axios.put(`/api/activities/${timer.activityId}`, {duration: timer.elapsedTime});
+                        let newActivity = await axios.put(`/api/activities/${timer.activityId}`, {duration: timer.elapsedTime});
+                        const activitiesStore = useActivitiesStore();
+                        activitiesStore.addActivity(newActivity.data);
+
                     }
                 } catch (error) {
                     console.error('Failed to update activity:', error);

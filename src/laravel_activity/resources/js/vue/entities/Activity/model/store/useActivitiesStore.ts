@@ -40,6 +40,11 @@ export const useActivitiesStore = defineStore('activities', {
                 this.isLoading = false;
             }
         },
+        addActivity(activity) {
+            const sectionId = activity.activity_section_id;
+            this.data[sectionId].activities.data.unshift(activity);
+            // this.data.unshift(activity);
+        },
         async loadMore(sectionId) {
             try {
                 if (this.isLoading || !this.sectionNavigation[sectionId] || !this.sectionNavigation[sectionId].lastPage) {
