@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 import axios from 'axios';
 
 export const useActivitiesStore = defineStore('activities', {
@@ -17,12 +17,13 @@ export const useActivitiesStore = defineStore('activities', {
             try {
                 this.isLoading = true;
                 const response = await axios.get('/api/activities');
+
                 this.data = response.data;
                 console.log(this.data);
 
-                Object.values(this.data).forEach(item => {
-
+                Object.values(this.data).forEach((item) => {
                     const sectionId = item.section.id;
+
                     this.sectionLoading[sectionId] = false;
                     this.sectionNavigation[sectionId] = {
                         currentPage: 1,
@@ -31,9 +32,9 @@ export const useActivitiesStore = defineStore('activities', {
                         total: item.activities.total,
                     };
 
-                    this.sectionHasMoreElements[sectionId] = item.activities.next_page_url !== null;
+                    this.sectionHasMoreElements[sectionId] =
+                        item.activities.next_page_url !== null;
                 });
-
             } catch (error) {
                 console.error('Error fetching activities:', error);
             } finally {
@@ -42,16 +43,34 @@ export const useActivitiesStore = defineStore('activities', {
         },
         addActivity(activity) {
             const sectionId = activity.activity_section_id;
-            this.data[sectionId].activities.data.unshift(activity);
+            const activityId = activity.id;
+            const existingActivityIndex = this.data[
+                sectionId
+            ].activities.data.findIndex((el) => el.id === activityId);
+
+            if (existingActivityIndex !== -1) {
+                // Заменяем существующую активность новым значением
+                this.data[sectionId].activities.data[existingActivityIndex] =
+                    activity;
+            } else {
+                // Добавляем новую активность в начало массива данных секции
+                this.data[sectionId].activities.data.unshift(activity);
+            }
+            // this.data.unshift(activity);
             // this.data.unshift(activity);
         },
         async loadMore(sectionId) {
             try {
-                if (this.isLoading || !this.sectionNavigation[sectionId] || !this.sectionNavigation[sectionId].lastPage) {
+                if (
+                    this.isLoading ||
+                    !this.sectionNavigation[sectionId] ||
+                    !this.sectionNavigation[sectionId].lastPage
+                ) {
                     return;
                 }
 
-                const nextPage = this.sectionNavigation[sectionId].currentPage + 1;
+                const nextPage =
+                    this.sectionNavigation[sectionId].currentPage + 1;
 
                 if (nextPage > this.sectionNavigation[sectionId].lastPage) {
                     this.sectionHasMoreElements[sectionId] = false;
@@ -60,24 +79,33 @@ export const useActivitiesStore = defineStore('activities', {
 
                 this.sectionLoading[sectionId] = true;
 
-                const response = await axios.get(`/api/activities?section_id=${sectionId}&page=${nextPage}`);
-                const activitiesData = response.data[sectionId]?.activities?.data;
+                const response = await axios.get(
+                    `/api/activities?section_id=${sectionId}&page=${nextPage}`,
+                );
+                const activitiesData =
+                    response.data[sectionId]?.activities?.data;
 
                 if (!activitiesData || activitiesData.length === 0) {
-                    console.error('No activities data found or data length is zero for section:', sectionId);
+                    console.error(
+                        'No activities data found or data length is zero for section:',
+                        sectionId,
+                    );
                     this.sectionHasMoreElements[sectionId] = false;
                 } else {
-                    Object.values(activitiesData).forEach(activity => {
+                    Object.values(activitiesData).forEach((activity) => {
                         this.data[sectionId].activities.data.push(activity);
                     });
-                    this.sectionNavigation[sectionId].currentPage = response.data[sectionId].activities.current_page;
-                    this.sectionHasMoreElements[sectionId] = response.data[sectionId].activities.next_page_url !== null;
+                    this.sectionNavigation[sectionId].currentPage =
+                        response.data[sectionId].activities.current_page;
+                    this.sectionHasMoreElements[sectionId] =
+                        response.data[sectionId].activities.next_page_url !==
+                        null;
                 }
             } catch (error) {
                 console.error('Error loading more activities:', error);
             } finally {
                 this.sectionLoading[sectionId] = false;
             }
-        }
+        },
     },
 });

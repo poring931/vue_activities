@@ -1,52 +1,51 @@
 {
-  "compilerOptions": {
-    "allowJs": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noUnusedParameters": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "useDefineForClassFields": true,
-    "module": "ES2022",
-    "moduleResolution": "Node",
-    "noUncheckedIndexedAccess": true,
-    "noEmit": true,
-    "strictNullChecks": true,
-    "strictSaveType": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ES2022",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
-    "types": [
-      "vite/client"
-    ],
-    "paths": {
-      //      "@/*": ["./resources/js/vue/*"]
-      "@/*": [
-        "./*"
-      ]
-    },
-    "baseUrl": "resources/js/vue/"
-  },
-  "include": [
-    "resources/**/*.ts",
-    "resources/**/*.d.ts",
-    "resources/**/*.tsx",
-    "resources/**/*.vue"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "ts-node": {
     "compilerOptions": {
-      "module": "CommonJS"
+        "allowJs": false,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "noUnusedParameters": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "useDefineForClassFields": true,
+        "module": "ES2022",
+        "moduleResolution": "Node",
+        "noUncheckedIndexedAccess": true,
+        "noEmit": true,
+        "strictNullChecks": true,
+        "strictSaveType": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ES2022",
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
+        "types": [
+            "vite/client"
+        ],
+        "paths": {
+            "@/*": [
+                "resources/js/vue/*"
+            ]
+        },
+        "baseUrl": "."
+    },
+    "include": [
+        "resources/**/*.ts",
+        "resources/**/*.d.ts",
+        "resources/**/*.tsx",
+        "resources/**/*.vue"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
     }
-  }
 }

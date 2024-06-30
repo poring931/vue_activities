@@ -1,2 +1,3 @@
-import Activity  from "./ui/Activity";
-export default  Activity
+import Activity from '@/widgets/Activity/ui/Activity.vue';
+
+export default Activity;
